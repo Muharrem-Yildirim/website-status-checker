@@ -11,11 +11,6 @@ dotenv.config();
 const CHECK_INTERVAL: number = parseInt(process.env.CHECK_INTERVAL ?? "600");
 
 async function main() {
-  if (typeof process.env.WEBSITE_URL == "undefined") {
-    console.error("WEBSITE_URL is not defined in .env file, exiting...");
-    return;
-  }
-
   if (typeof process.env.MONGODB_URI != "undefined") {
     await mongoose.connect();
     global.loggingEnabled = true;
