@@ -25,17 +25,17 @@ async function ping() {
   const WEBSITE_URLS = Website.find({});
 
   for await (const WEBSITE of WEBSITE_URLS) {
-    fetch(WEBSITE.hostname)
+    fetch(`${WEBSITE.protocol}://${WEBSITE.hostname}`)
       .then((res) => {
         if (res.ok) {
           log(
-            WEBSITE.hostname,
+            WEBSITE,
             LogTypes.INFO,
             `Successfully connected to ${WEBSITE.hostname}.`
           );
         } else {
           log(
-            WEBSITE.hostname,
+            WEBSITE,
             LogTypes.ERROR,
             `Error while connecting to ${WEBSITE.hostname}, response code is [${res.status} ${res.statusText}].`
           );
@@ -43,7 +43,7 @@ async function ping() {
       })
       .catch((error) => {
         log(
-          WEBSITE.hostname,
+          WEBSITE,
           LogTypes.ERROR,
           `Error while connecting to ${WEBSITE.hostname}, message is [${error.message}].`
         );
