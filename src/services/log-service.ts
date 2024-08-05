@@ -2,12 +2,14 @@ import telegram from "../notificators/telegram";
 import mail from "../notificators/mail";
 import Log, { LogTypes } from "../schemas/log";
 
-async function log(hostname, type, message) {
-  const log = new Log({ type, hostname, message });
+async function log(website, type, message) {
+  const log = new Log({ type, website, message });
 
   if (type == LogTypes.ERROR) {
-    telegram.notify(`[${type}] ${message}`);
-    mail.notify(`[${type}] ${message}`, hostname);
+    if (website.notifyOptions.telegram) telegram.notify(`[${type}] ${message}`);
+
+    if (website.notifyOptions.mail)
+      mail.notify(`[${type}] ${message}`, website.hostname);
   }
 
   console.log(`[${type}] ${message}`);
