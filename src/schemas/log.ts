@@ -1,4 +1,5 @@
 import { Schema, model } from "mongoose";
+import Website from "./website";
 
 export enum LogTypes {
   ERROR = "error",
@@ -6,14 +7,18 @@ export enum LogTypes {
 }
 
 export interface ILog {
-  hostname: string;
+  website: Schema.Types.ObjectId;
   type: LogTypes;
   message: string;
 }
 
 const logSchema = new Schema<ILog>(
   {
-    hostname: { type: String, required: true },
+    website: {
+      type: Schema.Types.ObjectId,
+      required: true,
+      ref: "Website",
+    },
     type: { type: String, required: true },
     message: { type: String, required: true },
   },
