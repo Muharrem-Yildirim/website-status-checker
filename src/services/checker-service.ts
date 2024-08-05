@@ -1,5 +1,4 @@
 import { LogTypes } from "../schemas/log";
-import Website from "../schemas/website";
 import { log } from "./log-service";
 
 export async function ping(websites) {

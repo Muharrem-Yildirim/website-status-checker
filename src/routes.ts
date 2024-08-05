@@ -3,6 +3,7 @@ import { validateData } from "./middleware/validation-middleware";
 import { registerHostValidation } from "./zod/register-host-schema";
 import Website from "./schemas/website";
 import { StatusCodes } from "http-status-codes";
+import expressBasicAuth from "express-basic-auth";
 
 const APP = express();
 const API_ROUTER = express.Router();
@@ -16,6 +17,20 @@ export async function initRoutes() {
   APP.use(express.json());
 
   APP.use("/api", API_ROUTER);
+
+  API_ROUTER.use(
+    expressBasicAuth({
+      users: {
+        [process.env.BASIC_AUTH_USERNAME]: process.env.BASIC_AUTH_PASSWORD,
+      },
+      unauthorizedResponse: () => {
+        return {
+          success: false,
+          message: "Invalid credentials",
+        };
+      },
+    })
+  );
 
   API_ROUTER.get("/hosts", (req: Request, res) => {
     Website.find({}).then((websites) => {
