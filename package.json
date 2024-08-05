@@ -6,6 +6,7 @@
   "scripts": {
     "start": "node dist/index.js",
     "build": "tsc",
+    "deploy": "npm i && tsc && npm start",
     "dev": "npx nodemon ./src/index.ts"
   },
   "keywords": [],
