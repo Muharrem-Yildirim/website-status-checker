@@ -1,5 +1,4 @@
 import { Schema, model } from "mongoose";
-import Website from "./website";
 
 export enum LogTypes {
   ERROR = "error",
