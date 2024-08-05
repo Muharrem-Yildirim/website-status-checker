@@ -18,4 +18,4 @@ This is a simple script to check if the website is up and running. When it's not
 
 - Add more notificators [ex: Discord, Slack, SMTP etc..]
 - UI
-- Multiple domain check mechanism
+- ~~Multiple domain check mechanism~~
