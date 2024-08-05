@@ -31,11 +31,11 @@ export async function initRoutes() {
     validateData(registerHostValidation),
     (req: Request, res) => {
       console.log("Received request:", req.body);
-      const { hostname } = req.body;
+      const { hostname, notifyOptions } = req.body;
 
       Website.findOneAndUpdate(
         { hostname },
-        { hostname },
+        { hostname, notifyOptions },
         {
           upsert: true,
         }
