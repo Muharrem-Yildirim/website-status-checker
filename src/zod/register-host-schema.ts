@@ -10,5 +10,5 @@ export const registerHostValidation = z.object({
     })
     .strict(),
   isActive: z.boolean().optional().default(false),
-  protocol: z.enum(["http", "https"]).optional(),
+  protocol: z.enum(["http", "https"]),
 });
