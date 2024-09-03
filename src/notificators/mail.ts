@@ -10,6 +10,11 @@ class Mail extends Notificator {
         user: process.env.MAIL_USER,
         pass: process.env.MAIL_PASSWORD,
       },
+      secure: (process.env?.MAIL_SECURE ?? "true") === "true",
+      tls: {
+        rejectUnauthorized:
+          (process.env?.MAIL_REJECT_UNAUTHORIZED ?? "true") === "true",
+      },
     });
 
     return transporter;
