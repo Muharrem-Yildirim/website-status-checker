@@ -198,12 +198,14 @@ export async function initRoutes() {
         { ...req.validatedBody },
         {
           upsert: true,
+          returnDocument: "after",
         }
       )
-        .then(() => {
+        .then((data) => {
           res.json({
             success: true,
             message: `Successfully registered ${hostname}.`,
+            data,
           });
         })
         .catch((err) => {
