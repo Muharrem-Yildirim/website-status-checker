@@ -2,7 +2,12 @@ import z from "zod";
 
 export const registerHostValidation = z.object({
   ownerIdentifier: z.string(),
-  hostname: z.string().min(1),
+  hostname: z
+    .string()
+    .regex(/^(?!:\/\/)([a-zA-Z0-9-_]+\.)+[a-zA-Z]{2,}$/, {
+      message: "Please enter a valid hostname.",
+    })
+    .min(1, { message: "Hostname is required" }),
   notifyOptions: z
     .object({
       email: z.boolean().optional().default(false),

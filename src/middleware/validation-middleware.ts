@@ -10,6 +10,8 @@ export function validateData(schema: z.ZodObject<any, any>) {
     next: NextFunction
   ) => {
     try {
+      console.log("request came", req.body);
+
       req.validatedBody = await schema.parse(req.body);
 
       console.log("validation success", req.validatedBody);
