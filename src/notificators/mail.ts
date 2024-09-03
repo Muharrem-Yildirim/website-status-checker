@@ -14,10 +14,10 @@ class Mail extends Notificator {
 
     return transporter;
   }
-  notify(string, hostname) {
+  notify(string, hostname, target) {
     this.client().sendMail({
       from: process.env.MAIL_FROM,
-      to: process.env.MAIL_TO,
+      to: target,
       subject: "Your Site is Down - " + hostname,
       text: string,
       html: string,

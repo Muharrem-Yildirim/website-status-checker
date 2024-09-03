@@ -28,8 +28,14 @@ const websiteSchema = new Schema<IWebsite>(
     hostname: { type: String, required: true },
     protocol: { type: String, required: true, default: "http" },
     notifyOptions: {
-      email: { type: Boolean, required: true, default: false },
-      telegram: { type: Boolean, required: true, default: false },
+      email: {
+        isActive: { type: Boolean, required: true, default: false },
+        target: { type: String, required: true, default: null },
+      },
+      telegram: {
+        isActive: { type: Boolean, required: true, default: false },
+        target: { type: String, required: true, default: null },
+      },
     },
     checkCount: { type: Number, required: true, default: 0 },
     failedCheckCount: { type: Number, required: true, default: 0 },

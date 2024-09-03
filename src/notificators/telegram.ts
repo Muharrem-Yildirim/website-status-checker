@@ -5,8 +5,8 @@ class Telegram extends Notificator {
   client() {
     return new TelegramBot(process.env.TELEGRAM_TOKEN);
   }
-  notify(string) {
-    this.client().sendMessage(process.env.TELEGRAM_CHAT_ID, string);
+  notify(string, hostname, target) {
+    this.client().sendMessage(target, string);
   }
 }
 

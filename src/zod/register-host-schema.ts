@@ -10,8 +10,25 @@ export const registerHostValidation = z.object({
     .min(1, { message: "Hostname is required" }),
   notifyOptions: z
     .object({
-      email: z.boolean().optional().default(false),
-      telegram: z.boolean().optional().default(false),
+      email: z.object({
+        isActive: z.boolean().optional().default(false),
+        target: z
+          .string()
+          .email()
+          .min(1, { message: "Email target is required." })
+          .optional()
+          .nullable()
+          .default(null),
+      }),
+      telegram: z.object({
+        isActive: z.boolean().optional().default(false),
+        target: z
+          .string()
+          .min(1, { message: "Telegram target is required." })
+          .optional()
+          .nullable()
+          .default(null),
+      }),
     })
     .strict(),
   isActive: z.boolean().optional().default(false),
