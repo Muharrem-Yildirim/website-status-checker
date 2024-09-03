@@ -218,6 +218,30 @@ export async function initRoutes() {
     }
   );
 
+  apiRouter.delete("/hosts/:id", (req: Request, res) => {
+    const ownerIdentifier = (req.query?.ownerIdentifier as string) ?? "";
+    const { id } = req.params;
+
+    Website.findOneAndDelete({ ownerIdentifier, _id: id })
+      .then((website) => {
+        if (!website) {
+          return res.status(404).json({
+            success: false,
+            message: "Hostname not found.",
+          });
+        }
+
+        res.status(StatusCodes.NO_CONTENT).json({});
+      })
+      .catch((err) => {
+        res.status(500).json({
+          success: false,
+          message: "Error unregistering host.",
+          details: err,
+        });
+      });
+  });
+
   apiRouter.delete("/unregister-host/:hostname", (req: Request, res) => {
     console.log("Received request:", req.params);
     const { hostname, ownerIdentifier } = req.params;
