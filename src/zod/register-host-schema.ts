@@ -1,11 +1,14 @@
 import z from "zod";
 
 export const registerHostValidation = z.object({
-  hostname: z.string(),
+  ownerIdentifier: z.string(),
+  hostname: z.string().min(1),
   notifyOptions: z
     .object({
-      mail: z.boolean().optional().default(false),
+      email: z.boolean().optional().default(false),
       telegram: z.boolean().optional().default(false),
     })
     .strict(),
+  isActive: z.boolean().optional().default(false),
+  protocol: z.enum(["http", "https"]).optional(),
 });
