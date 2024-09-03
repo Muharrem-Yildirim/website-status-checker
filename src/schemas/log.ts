@@ -9,6 +9,7 @@ export interface ILog {
   website: Schema.Types.ObjectId;
   type: LogTypes;
   message: string;
+  isUp: boolean;
 }
 
 const logSchema = new Schema<ILog>(
@@ -20,6 +21,7 @@ const logSchema = new Schema<ILog>(
     },
     type: { type: String, required: true },
     message: { type: String, required: true },
+    isUp: { type: Boolean, required: true, default: false },
   },
   {
     timestamps: true,
