@@ -8,6 +8,7 @@ services:
       MONGO_URI: mongodb://mongo:27017/website-status-checker
     depends_on:
       - mongo
+    restart: always
 
   mongo:
     image: mongo
@@ -15,6 +16,7 @@ services:
       - "27017:27017"
     volumes:
       - mongo-data:/data/db
+    restart: always
 
 volumes:
   mongo-data:
