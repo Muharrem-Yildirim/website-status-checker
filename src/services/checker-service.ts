@@ -19,12 +19,24 @@ export async function ping(websites) {
           );
         }
       })
-      .catch((error) => {
+      .catch(async (error) => {
         log(
           WEBSITE,
           LogTypes.ERROR,
           `Error while connecting to ${WEBSITE.hostname}, message is [${error.message}].`
         );
+
+        await WEBSITE.updateOne({
+          $where: {
+            hostname: WEBSITE.hostname,
+          },
+          $set: {
+            lastCheck: new Date(),
+          },
+          $inc: {
+            failedCheckCount: 1,
+          },
+        });
       })
       .finally(async () => {
         await WEBSITE.updateOne({
@@ -32,7 +44,10 @@ export async function ping(websites) {
             hostname: WEBSITE.hostname,
           },
           $set: {
-            lastChecked: new Date(),
+            lastCheck: new Date(),
+          },
+          $inc: {
+            checkCount: 1,
           },
         });
       });
