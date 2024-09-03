@@ -10,6 +10,7 @@ async function job() {
           1000 * (parseInt(process.env.CHECK_INTERVAL) || 60 * 60) * 2
       ),
     },
+    isActive: true,
     plan: Plan.FREE,
   });
 
@@ -19,6 +20,7 @@ async function job() {
         Date.now() - 1000 * (parseInt(process.env.CHECK_INTERVAL) || 60 * 60)
       ),
     },
+    isActive: true,
     plan: Plan.PAID,
   });
 
