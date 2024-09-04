@@ -6,7 +6,7 @@ export enum LogTypes {
 }
 
 export interface ILog {
-  website: Schema.Types.ObjectId;
+  host: Schema.Types.ObjectId;
   type: LogTypes;
   message: string;
   isUp: boolean;
@@ -14,10 +14,10 @@ export interface ILog {
 
 const logSchema = new Schema<ILog>(
   {
-    website: {
+    host: {
       type: Schema.Types.ObjectId,
       required: true,
-      ref: "Website",
+      ref: "Host",
     },
     type: { type: String, required: true },
     message: { type: String, required: true },

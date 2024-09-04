@@ -2,35 +2,35 @@ import telegram from "../notificators/telegram";
 import mail from "../notificators/mail";
 import Log, { LogTypes } from "../schemas/log";
 
-async function log(website, type, message) {
+async function log(host, type, message) {
   const log = new Log({
     type,
-    website,
+    host,
     message,
     isUp: type == LogTypes.ERROR ? false : true,
   });
 
   if (type == LogTypes.ERROR) {
     if (
-      website.notifyOptions.telegram &&
-      website.notifyOptions?.telegram?.target != "" &&
-      website.notifyOptions?.telegram?.target != null
+      host.notifyOptions.telegram &&
+      host.notifyOptions?.telegram?.target != "" &&
+      host.notifyOptions?.telegram?.target != null
     )
       telegram.notify(
         `[${type}] ${message}`,
-        website.hostname,
-        website.notifyOptions?.telegram?.target
+        host.hostname,
+        host.notifyOptions?.telegram?.target
       );
 
     if (
-      website.notifyOptions.email &&
-      website.notifyOptions?.email?.target != "" &&
-      website.notifyOptions?.email?.target != null
+      host.notifyOptions.email &&
+      host.notifyOptions?.email?.target != "" &&
+      host.notifyOptions?.email?.target != null
     )
       mail.notify(
         `[${type}] ${message}`,
-        website.hostname,
-        website.notifyOptions?.email?.target
+        host.hostname,
+        host.notifyOptions?.email?.target
       );
   }
 

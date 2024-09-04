@@ -1,18 +1,18 @@
 import { StatusCodes } from "http-status-codes";
-import Website, { Plan } from "../schemas/website";
+import Host, { Plan } from "../schemas/host";
 
 const getHosts = (req: Request & { query: { filter?: string } }, res) => {
   const filter = JSON.parse((req.query?.filter as string) ?? "{}");
 
-  Website.find(filter)
+  Host.find(filter)
     .populate({
       path: "logs",
       options: { sort: { createdAt: -1 }, limit: 120 },
     })
-    .then((websites) => {
+    .then((hosts) => {
       res.json({
         success: true,
-        data: websites,
+        data: hosts,
       });
     })
     .catch((err) => {
@@ -33,18 +33,18 @@ const getHostById = (
 ) => {
   const ownerIdentifier = (req.query?.ownerIdentifier as string) ?? "";
 
-  Website.findOne({ ownerIdentifier, _id: req.params.id })
+  Host.findOne({ ownerIdentifier, _id: req.params.id })
     .populate({
       path: "logs",
       options: { sort: { createdAt: -1 }, limit: 120 },
     })
 
-    .then((website) => {
-      if (!website) throw new Error("Website not found");
+    .then((host) => {
+      if (!host) throw new Error("Host not found");
 
       res.json({
         success: true,
-        data: website,
+        data: host,
       });
     })
     .catch((err) => {
@@ -63,7 +63,9 @@ const saveHost = async (
   console.log("Received request:", req.body);
   const { hostname, ownerIdentifier, plan } = req.validatedBody;
 
-  const isAlreadyExists = await Website.findOne({
+  console.log(req.validatedBody);
+
+  const isAlreadyExists = await Host.findOne({
     ownerIdentifier,
     hostname,
   });
@@ -81,7 +83,7 @@ const saveHost = async (
     limit = 25;
   }
 
-  const count = await Website.countDocuments({
+  const count = await Host.countDocuments({
     ownerIdentifier,
   });
 
@@ -92,7 +94,7 @@ const saveHost = async (
     });
   }
 
-  Website.create({ ...req.validatedBody })
+  Host.create({ ...req.validatedBody })
     .then((data) => {
       res.json({
         success: true,
@@ -118,7 +120,7 @@ const updateHost = async (
   const { hostname, ownerIdentifier } = req.validatedBody;
   const { id } = req.params;
 
-  Website.updateOne(
+  Host.updateOne(
     { ownerIdentifier, _id: id },
     { ...req.validatedBody },
     {
@@ -155,9 +157,9 @@ const deleteHost = (
   const ownerIdentifier = (req.query?.ownerIdentifier as string) ?? "";
   const { id } = req.params;
 
-  Website.findOneAndDelete({ ownerIdentifier, _id: id })
-    .then((website) => {
-      if (!website) {
+  Host.findOneAndDelete({ ownerIdentifier, _id: id })
+    .then((host) => {
+      if (!host) {
         return res.status(404).json({
           success: false,
           message: "Hostname not found.",

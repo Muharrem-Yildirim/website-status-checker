@@ -5,7 +5,7 @@ export enum Plan {
   PAID = "paid",
 }
 
-export interface IWebsite {
+export interface IHost {
   plan: Plan;
   ownerIdentifier: string;
   hostname: string;
@@ -21,7 +21,7 @@ export interface IWebsite {
   logs: Schema.Types.ObjectId[];
 }
 
-const websiteSchema = new Schema<IWebsite>(
+const hostSchema = new Schema<IHost>(
   {
     plan: { type: String, required: true, default: Plan.FREE },
     ownerIdentifier: { type: String, required: true },
@@ -30,11 +30,11 @@ const websiteSchema = new Schema<IWebsite>(
     notifyOptions: {
       email: {
         isActive: { type: Boolean, required: true, default: false },
-        target: { type: String, required: true, default: null },
+        target: { type: String, required: false, default: null },
       },
       telegram: {
         isActive: { type: Boolean, required: true, default: false },
-        target: { type: String, required: true, default: null },
+        target: { type: String, required: false, default: null },
       },
     },
     checkCount: { type: Number, required: true, default: 0 },
@@ -50,14 +50,14 @@ const websiteSchema = new Schema<IWebsite>(
   }
 );
 
-websiteSchema.index({ ownerIdentifier: 1, hostname: 1 }, { unique: true });
-websiteSchema.virtual("logs", {
+hostSchema.index({ ownerIdentifier: 1, hostname: 1 }, { unique: true });
+hostSchema.virtual("logs", {
   ref: "Log",
   localField: "_id",
-  foreignField: "website",
+  foreignField: "host",
   justOne: false,
 });
 
-const Website = model<IWebsite>("Website", websiteSchema);
+const Host = model<IHost>("Host", hostSchema);
 
-export default Website;
+export default Host;

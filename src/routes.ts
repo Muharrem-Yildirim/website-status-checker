@@ -1,7 +1,7 @@
 import express, { Request } from "express";
 import { validateData } from "./middleware/validation-middleware";
 import { registerHostValidation } from "./zod/register-host-schema";
-import Website, { Plan } from "./schemas/website";
+import Host, { Plan } from "./schemas/host";
 import { StatusCodes } from "http-status-codes";
 import expressBasicAuth from "express-basic-auth";
 import Log from "./schemas/log";
@@ -58,9 +58,9 @@ export async function initRoutes() {
     console.log("Received request:", req.params);
     const { hostname, ownerIdentifier } = req.params;
 
-    Website.findOneAndDelete({ hostname, ownerIdentifier })
-      .then((website) => {
-        if (!website) {
+    Host.findOneAndDelete({ hostname, ownerIdentifier })
+      .then((host) => {
+        if (!host) {
           return res.status(404).json({
             success: false,
             message: "Hostname not found.",

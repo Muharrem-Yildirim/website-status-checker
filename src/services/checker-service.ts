@@ -1,8 +1,8 @@
 import { LogTypes } from "../schemas/log";
 import { log } from "./log-service";
 
-export async function ping(websites) {
-  for await (const WEBSITE of websites) {
+export async function ping(hosts) {
+  for await (const WEBSITE of hosts) {
     fetch(`${WEBSITE.protocol}://${WEBSITE.hostname}`)
       .then((res) => {
         if (res.ok) {

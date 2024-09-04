@@ -1,4 +1,4 @@
-import Website from "../schemas/website";
+import Host from "../schemas/host";
 
 const getStatistics = async (
   req: Request & { query: { filter?: string } },
@@ -6,14 +6,14 @@ const getStatistics = async (
 ) => {
   const filter = JSON.parse((req.query?.filter as string) ?? "{}");
 
-  const totalHosts = await Website.find(filter).countDocuments();
+  const totalHosts = await Host.find(filter).countDocuments();
   var totalChecks = 0;
   var totalFailedChecks = 0;
 
   try {
     totalChecks =
       (
-        await Website.aggregate([
+        await Host.aggregate([
           {
             $match: filter,
           },
@@ -33,7 +33,7 @@ const getStatistics = async (
   try {
     totalFailedChecks =
       (
-        await Website.aggregate([
+        await Host.aggregate([
           {
             $match: filter,
           },

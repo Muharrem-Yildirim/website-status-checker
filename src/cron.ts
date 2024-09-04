@@ -1,9 +1,9 @@
 import cron from "node-cron";
-import Website, { Plan } from "./schemas/website";
+import Host, { Plan } from "./schemas/host";
 import { ping } from "./services/checker-service";
 
 async function job() {
-  const FREE_PLAN_WEBSITES = await Website.find({
+  const FREE_PLAN_WEBSITES = await Host.find({
     lastCheck: {
       $lt: new Date(
         Date.now() -
@@ -14,7 +14,7 @@ async function job() {
     plan: Plan.FREE,
   });
 
-  const PAID_PLAN_WEBSITES = await Website.find({
+  const PAID_PLAN_WEBSITES = await Host.find({
     lastCheck: {
       $lt: new Date(
         Date.now() - 1000 * (parseInt(process.env.CHECK_INTERVAL) || 60 * 60)
