@@ -34,7 +34,7 @@ async function log(host, type, message) {
       );
   }
 
-  console.log(`[${type}] ${message}`);
+  console.log(`[${new Date().toUTCString()}] [${type}] ${message}`);
 
   if (global.loggingEnabled) await log.save();
 }
