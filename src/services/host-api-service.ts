@@ -31,7 +31,7 @@ const getHostById = (
 	},
 	res
 ) => {
-	const ownerIdentifier = req.query?.ownerIdentifier ?? "";
+	const ownerIdentifier = req.query?.ownerIdentifier;
 	const _page = parseInt(req.query?.page as string) || 0;
 	let _limit = parseInt(req.query?.limit as string) || 120;
 
