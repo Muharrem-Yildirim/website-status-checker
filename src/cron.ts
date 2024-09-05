@@ -38,7 +38,7 @@ async function job() {
 }
 
 export function initCrons() {
-	// cron.schedule("* * * * *", job);
+	cron.schedule("* * * * *", job);
 
 	if (process.env.NODE_ENV !== "production") {
 		job();
