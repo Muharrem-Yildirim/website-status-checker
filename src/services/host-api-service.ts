@@ -1,10 +1,25 @@
 import { StatusCodes } from "http-status-codes";
 import Host, { Plan } from "../schemas/host";
 
-const getHosts = (req: Request & { query: { filter?: string } }, res) => {
-	const filter = JSON.parse((req.query?.filter as string) ?? "{}");
+const getHosts = (
+	req: Request & {
+		query: { ownerIdentifier?: string; page?: string; limit?: string };
+	},
+	res
+) => {
+	const ownerIdentifier = (req.query?.ownerIdentifier as string) || "";
+	const _page = parseInt(req.query?.page as string) || 1;
+	let _limit = parseInt(req.query?.limit as string) || 120;
 
-	Host.find(filter)
+	if (_limit > 120) _limit = 120;
+
+	const _skip = (_page - 1) * _limit;
+
+	let filter: { ownerIdentifier?: string } = {};
+
+	if (ownerIdentifier !== "") filter = { ownerIdentifier };
+
+	Host.find(filter, {}, { skip: _skip, limit: _limit })
 		.populate({
 			path: "logs",
 			options: { sort: { createdAt: -1 }, limit: 120 },
@@ -32,17 +47,16 @@ const getHostById = (
 	res
 ) => {
 	const ownerIdentifier = req.query?.ownerIdentifier;
-	const _page = parseInt(req.query?.page as string) || 0;
+	const _page = parseInt(req.query?.page as string) || 1;
 	let _limit = parseInt(req.query?.limit as string) || 120;
 
 	if (_limit > 120) _limit = 120;
 
-	const _skip = _page * _limit;
+	const _skip = (_page - 1) * _limit;
 
 	let filter: { _id: string; ownerIdentifier?: string } = {
 		_id: req.params.id,
 	};
-
 	if (ownerIdentifier) filter = { ownerIdentifier, _id: req.params.id };
 
 	Host.findOne(filter)
@@ -66,7 +80,7 @@ const getHostById = (
 		.catch((err) => {
 			res.status(500).json({
 				success: false,
-				message: "Error fetching hosts.",
+				message: "Error fetching host.",
 				details: err,
 			});
 		});
