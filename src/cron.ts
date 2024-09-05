@@ -4,22 +4,22 @@ import { ping } from "./services/checker-service";
 
 async function job() {
 	const query = {
-		$or: [
-			{
-				lastCheck: {
-					$lt: new Date(
-						Date.now() -
-							1000 *
-								(parseInt(process.env.CHECK_INTERVAL) ||
-									60 * 60) *
-								2
-					),
-				},
-			},
-			{
-				lastCheck: null,
-			},
-		],
+		// $or: [
+		// 	{
+		// 		lastCheck: {
+		// 			$lt: new Date(
+		// 				Date.now() -
+		// 					1000 *
+		// 						(parseInt(process.env.CHECK_INTERVAL) ||
+		// 							60 * 60) *
+		// 						2
+		// 			),
+		// 		},
+		// 	},
+		// 	{
+		// 		lastCheck: null,
+		// 	},
+		// ],
 		isActive: true,
 	};
 
@@ -38,7 +38,11 @@ async function job() {
 }
 
 export function initCrons() {
-	cron.schedule("* * * * *", job);
+	// cron.schedule("* * * * *", job);
+
+	if (process.env.NODE_ENV !== "production") {
+		job();
+	}
 
 	console.log("Crons initialized");
 }
