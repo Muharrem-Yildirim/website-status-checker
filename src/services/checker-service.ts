@@ -8,20 +8,12 @@ export async function ping(hosts) {
 			.get(`${host.protocol}://${host.hostname}`, {
 				timeout: 5000,
 			})
-			.then((res) => {
-				if (res.ok) {
-					log(
-						host,
-						LogTypes.INFO,
-						`Successfully connected to ${host.hostname}.`
-					);
-				} else {
-					log(
-						host,
-						LogTypes.ERROR,
-						`Error while connecting to ${host.hostname}, response code is [${res.status} ${res.statusText}].`
-					);
-				}
+			.then(() => {
+				log(
+					host,
+					LogTypes.INFO,
+					`Successfully connected to ${host.hostname}.`
+				);
 			})
 			.catch(async (error) => {
 				log(
