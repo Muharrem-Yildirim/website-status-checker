@@ -1,6 +1,19 @@
 import axios from "axios";
 import { LogTypes } from "../schemas/log";
 import { log } from "./log-service";
+import axiosRetry from "axios-retry";
+
+axiosRetry(axios, {
+	retries: 3,
+	retryDelay: (retryCount) => retryCount * 1000,
+	onRetry: (retryCount, error) => {
+		console.log(
+			`Retrying... ${retryCount} time(s). Message: `,
+			error.message
+		);
+	},
+	retryCondition: () => true,
+});
 
 export async function ping(hosts) {
 	for await (const host of hosts) {
