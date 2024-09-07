@@ -32,6 +32,8 @@ const getHosts = (
 			});
 		})
 		.catch((err) => {
+			console.log(err);
+
 			res.status(500).json({
 				success: false,
 				message: "Error fetching hosts.",
@@ -47,7 +49,7 @@ const getHostById = (
 	},
 	res
 ) => {
-	const ownerIdentifier = req.query?.ownerIdentifier;
+	const ownerIdentifier = (req.query?.ownerIdentifier as string) || "";
 	const _page = parseInt(req.query?.page as string) || 1;
 	let _limit = parseInt(req.query?.limit as string) || 120;
 
@@ -58,7 +60,8 @@ const getHostById = (
 	let filter: { _id: string; ownerIdentifier?: string } = {
 		_id: req.params.id,
 	};
-	if (ownerIdentifier) filter = { ownerIdentifier, _id: req.params.id };
+	if (ownerIdentifier !== "")
+		filter = { ownerIdentifier, _id: req.params.id };
 
 	Host.findOne(filter)
 		.populate({
@@ -80,6 +83,8 @@ const getHostById = (
 			});
 		})
 		.catch((err) => {
+			console.log(err);
+
 			res.status(500).json({
 				success: false,
 				message: "Error fetching host.",
