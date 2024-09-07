@@ -5,8 +5,8 @@ class Webhook extends Notificator {
 	client() {
 		return axios.create();
 	}
-	notify(string, hostname, target) {
-		this.client().post(target, { hostname, message: string });
+	notify(subject, message, hostname, target) {
+		this.client().post(target, { hostname, message: message });
 	}
 }
 

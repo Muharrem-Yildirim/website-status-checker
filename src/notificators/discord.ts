@@ -29,11 +29,11 @@ class Discord extends Notificator {
 		});
 	}
 
-	notify(string, hostname, target) {
+	notify(subject, message, hostname, target) {
 		this.client()
 			.users.fetch(target)
 			.then((user) => {
-				user.send(string);
+				user.send(message);
 			});
 	}
 }

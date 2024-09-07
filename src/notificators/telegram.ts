@@ -2,12 +2,12 @@ import TelegramBot from "node-telegram-bot-api";
 import Notificator from "./notificator";
 
 class Telegram extends Notificator {
-  client() {
-    return new TelegramBot(process.env.TELEGRAM_TOKEN);
-  }
-  notify(string, hostname, target) {
-    this.client().sendMessage(target, string);
-  }
+	client() {
+		return new TelegramBot(process.env.TELEGRAM_TOKEN);
+	}
+	notify(subject, message, hostname, target) {
+		this.client().sendMessage(target, message);
+	}
 }
 
 const telegram = new Telegram();
