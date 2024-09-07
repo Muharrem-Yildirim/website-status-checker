@@ -33,6 +33,7 @@ logSchema.index({ type: 1 });
 logSchema.index({ isUp: 1 });
 logSchema.index({ host: 1, type: 1 });
 logSchema.index({ host: 1, isUp: 1 });
+logSchema.index({ createdAt: -1 });
 
 const Log = model<ILog>("Log", logSchema);
 

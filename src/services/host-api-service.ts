@@ -24,6 +24,7 @@ const getHosts = (
 			path: "logs",
 			options: { sort: { createdAt: -1 }, limit: 120 },
 		})
+		.lean()
 		.then((hosts) => {
 			res.json({
 				success: true,
@@ -68,6 +69,7 @@ const getHostById = (
 				limit: _limit,
 			},
 		})
+		.lean()
 
 		.then((host) => {
 			if (!host) throw new Error("Host not found");
@@ -157,6 +159,7 @@ const updateHost = async (
 			returnDocument: "after",
 		}
 	)
+		.lean()
 		.then((data) => {
 			res.json({
 				success: true,
@@ -188,6 +191,7 @@ const deleteHost = (
 	const { id } = req.params;
 
 	Host.findOneAndDelete({ ownerIdentifier, _id: id })
+		.lean()
 		.then((host) => {
 			if (!host) {
 				return res.status(404).json({
