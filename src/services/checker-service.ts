@@ -19,7 +19,11 @@ axiosRetry(axios, {
 		);
 	},
 	retryCondition: (error) => {
-		return isRetryableError(error) || isNetworkError(error);
+		return (
+			isRetryableError(error) ||
+			isNetworkError(error) ||
+			error.code === "ECONNABORTED"
+		);
 	},
 });
 
@@ -28,11 +32,12 @@ export function ping(hosts) {
 		axios
 			.get(`${host.protocol}://${host.hostname}`, {
 				timeout: TIMEOUT,
-				validateStatus: function (status) {
+				validateStatus: (status) => {
 					return status < 500;
 				},
 			})
-			.then(() => {
+			.then(({ status }) => {
+				console.log("Success, Status: ", status, host.hostname);
 				log(host, LogTypes.SUCCESS, null);
 			})
 			.catch(async (error) => {
