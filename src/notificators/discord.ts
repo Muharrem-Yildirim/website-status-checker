@@ -33,7 +33,7 @@ class Discord extends Notificator {
 		this.client()
 			.users.fetch(target)
 			.then((user) => {
-				user.send(message);
+				user.send(subject + "\n\n" + message);
 			});
 	}
 }
