@@ -59,6 +59,10 @@ const hostSchema = new Schema<IHost>(
 );
 
 hostSchema.index({ ownerIdentifier: 1, hostname: 1 }, { unique: true });
+hostSchema.index({ plan: 1 });
+hostSchema.index({ isActive: 1 });
+hostSchema.index({ checkCount: 1, failedCheckCount: 1 });
+
 hostSchema.virtual("logs", {
 	ref: "Log",
 	localField: "_id",
