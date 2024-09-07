@@ -9,7 +9,14 @@ async function log(host, type, message) {
 		isUp: type == LogTypes.ERROR ? false : true,
 	});
 
-	if (type == LogTypes.ERROR) {
+	const lastLog = await Log.findOne({ host: host._id }).sort({
+		createdAt: -1,
+	});
+
+	if (
+		type == LogTypes.ERROR &&
+		(!lastLog || lastLog.isUp) //status is changed
+	) {
 		Object.keys(notificatorMap).forEach(async (target) => {
 			if (
 				host.notifyOptions[target]?.isActive &&
@@ -34,6 +41,8 @@ async function log(host, type, message) {
 					.catch(console.error);
 			}
 		});
+	} else {
+		console.log("Skipped notification for ", host.hostname);
 	}
 
 	console.log(`[${new Date().toUTCString()}] [${type}] ${message}`);
