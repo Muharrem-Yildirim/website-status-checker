@@ -36,7 +36,7 @@ jobs:
                   echo "Pulling Latest Code:"
                   git pull origin main
                   echo "Stopping Docker Containers:"
-                  docker-compose down
+                  docker compose down
                   echo "Starting Docker Containers:"
-                  docker-compose up -d --build
+                  docker compose up -d --build
                   EOF
