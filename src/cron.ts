@@ -1,6 +1,17 @@
 import cron from "node-cron";
 import Host, { Plan } from "./schemas/host";
 import { ping } from "./services/checker-service";
+import notificatorMap from "./notificators/notificator-map";
+
+function initNotificators() {
+	Object.keys(notificatorMap).forEach(async (target) => {
+		notificatorMap[target]()
+			.then((notificator) => {
+				if (notificator.default.init) notificator.default.init();
+			})
+			.catch(console.error);
+	});
+}
 
 async function job() {
 	const query = {
@@ -45,4 +56,6 @@ export function initCrons() {
 	}
 
 	console.log("Crons initialized");
+
+	initNotificators();
 }

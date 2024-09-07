@@ -1,23 +1,34 @@
 import Notificator from "./notificator";
-import { Client, GatewayIntentBits } from "discord.js";
+import { ActivityType, Client, GatewayIntentBits } from "discord.js";
 
 class Discord extends Notificator {
 	_client: Client = null;
 
 	client() {
-		if (!this._client) {
-			this._client = new Client({
-				intents: [
-					GatewayIntentBits.Guilds,
-					GatewayIntentBits.DirectMessages,
-				],
-			});
-
-			this._client.login(process.env.DISCORD_TOKEN);
-		}
-
 		return this._client;
 	}
+
+	init() {
+		this._client = new Client({
+			intents: [
+				GatewayIntentBits.Guilds,
+				GatewayIntentBits.DirectMessages,
+			],
+		});
+
+		this._client.login(process.env.DISCORD_TOKEN).then(() => {
+			console.log("Discord client started");
+
+			this._client.once("ready", () => {
+				console.log("Discord client ready");
+
+				this._client.user.setActivity("Checking..", {
+					type: ActivityType.Watching,
+				});
+			});
+		});
+	}
+
 	notify(string, hostname, target) {
 		this.client()
 			.users.fetch(target)
