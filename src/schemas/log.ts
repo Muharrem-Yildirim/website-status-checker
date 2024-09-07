@@ -2,7 +2,7 @@ import { Schema, model } from "mongoose";
 
 export enum LogTypes {
 	ERROR = "error",
-	INFO = "info",
+	SUCCESS = "success",
 }
 
 export interface ILog {
@@ -20,7 +20,7 @@ const logSchema = new Schema<ILog>(
 			ref: "Host",
 		},
 		type: { type: String, required: true },
-		message: { type: String, required: true },
+		message: { type: String, required: false },
 		isUp: { type: Boolean, required: true, default: false },
 	},
 	{
