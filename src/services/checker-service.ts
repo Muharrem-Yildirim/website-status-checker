@@ -1,7 +1,7 @@
 import axios, { AxiosError, isAxiosError } from "axios";
 import { LogTypes } from "../schemas/log";
 import { log } from "./log-service";
-import axiosRetry, { isNetworkError } from "axios-retry";
+import axiosRetry, { isRetryableError, isNetworkError } from "axios-retry";
 
 const TIMEOUT = 10000;
 
@@ -19,7 +19,7 @@ axiosRetry(axios, {
 		);
 	},
 	retryCondition: (error) => {
-		return isNetworkError(error) || error.response?.status >= 500;
+		return isRetryableError(error) || isNetworkError(error);
 	},
 });
 
