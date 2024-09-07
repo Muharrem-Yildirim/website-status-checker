@@ -1,5 +1,7 @@
 import { StatusCodes } from "http-status-codes";
 import Host, { Plan } from "../schemas/host";
+import mongoose from "../lib/mongoose";
+import Log from "../schemas/log";
 
 const getHosts = (
 	req: Request & {
@@ -195,15 +197,16 @@ const deleteHost = (
 	const ownerIdentifier = (req.query?.ownerIdentifier as string) ?? "";
 	const { id } = req.params;
 
-	Host.findOneAndDelete({ ownerIdentifier, _id: id })
-		.lean()
-		.then((host) => {
+	Host.deleteOne({ ownerIdentifier, _id: id })
+		.then(async (host) => {
 			if (!host) {
 				return res.status(404).json({
 					success: false,
 					message: "Hostname not found.",
 				});
 			}
+
+			await Log.deleteMany({ host: req.params.id });
 
 			res.status(StatusCodes.NO_CONTENT).json({});
 		})
