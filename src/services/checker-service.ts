@@ -1,39 +1,42 @@
-import axios from "axios";
+import axios, { AxiosError, isAxiosError } from "axios";
 import { LogTypes } from "../schemas/log";
 import { log } from "./log-service";
-import axiosRetry from "axios-retry";
+import axiosRetry, { isNetworkError } from "axios-retry";
+
+const TIMEOUT = 10000;
 
 axiosRetry(axios, {
 	retries: 3,
-	retryDelay: (retryCount) => retryCount * 1000,
+	shouldResetTimeout: true,
+	retryDelay: (retryCount) => retryCount * TIMEOUT,
 	onRetry: (retryCount, error) => {
 		console.log(
 			`Retrying... ${retryCount} time(s). Message: `,
-			error.message
+			error.message,
+			isAxiosError(error)
+				? "Host is: " + (error as AxiosError).config.url
+				: "Not axios error"
 		);
 	},
-	retryCondition: () => true,
+	retryCondition: (error) => {
+		return isNetworkError(error) || error.response?.status >= 500;
+	},
 });
 
-export async function ping(hosts) {
-	for await (const host of hosts) {
+export function ping(hosts) {
+	for (const host of hosts) {
 		axios
 			.get(`${host.protocol}://${host.hostname}`, {
-				timeout: 5000,
+				timeout: TIMEOUT,
+				validateStatus: function (status) {
+					return status < 500;
+				},
 			})
 			.then(() => {
-				log(
-					host,
-					LogTypes.INFO,
-					`Successfully connected to ${host.hostname}.`
-				);
+				log(host, LogTypes.SUCCESS, null);
 			})
 			.catch(async (error) => {
-				log(
-					host,
-					LogTypes.ERROR,
-					`Error while connecting to ${host.hostname}, message is [${error.message}].`
-				);
+				log(host, LogTypes.ERROR, error.message);
 
 				await host.updateOne({
 					$where: {
