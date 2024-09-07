@@ -26,6 +26,7 @@ jobs:
       run: |
         ssh -o StrictHostKeyChecking=no $SSH_USER@$SERVER_IP << 'EOF'
           cd $PROJECT_PATH
+          ls -la
           git pull origin main
           docker compose down
           docker compose up -d --build
