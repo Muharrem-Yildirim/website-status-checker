@@ -9,7 +9,7 @@ axiosRetry(axios, {
 	retries: 3,
 	shouldResetTimeout: true,
 	retryDelay: (retryCount) => retryCount * TIMEOUT,
-	onRetry: (retryCount, error) => {
+	onRetry: async (retryCount, error) => {
 		console.log(
 			`Retrying... ${retryCount} time(s). Message: `,
 			error.message,
@@ -29,44 +29,40 @@ axiosRetry(axios, {
 
 export function ping(hosts) {
 	for (const host of hosts) {
-		axios
-			.get(`${host.protocol}://${host.hostname}`, {
-				timeout: TIMEOUT,
-				validateStatus: (status) => {
-					return status < 500;
-				},
-			})
-			.then(({ status }) => {
-				console.log("Success, Status: ", status, host.hostname);
-				log(host, LogTypes.SUCCESS, null);
-			})
-			.catch(async (error) => {
-				log(host, LogTypes.ERROR, error.message);
+		host.updateOne({
+			$where: {
+				hostname: host.hostname,
+			},
+			$set: {
+				lastCheck: new Date(),
+			},
+			$inc: {
+				checkCount: 1,
+			},
+		}).then(() => {
+			axios
+				.get(`${host.protocol}://${host.hostname}`, {
+					timeout: TIMEOUT,
+					validateStatus: (status) => {
+						return status < 500;
+					},
+				})
+				.then(({ status }) => {
+					console.log("Success, Status: ", status, host.hostname);
+					log(host, LogTypes.SUCCESS, null);
+				})
+				.catch(async (error) => {
+					log(host, LogTypes.ERROR, error.message);
 
-				await host.updateOne({
-					$where: {
-						hostname: host.hostname,
-					},
-					$set: {
-						lastCheck: new Date(),
-					},
-					$inc: {
-						failedCheckCount: 1,
-					},
+					await host.updateOne({
+						$where: {
+							hostname: host.hostname,
+						},
+						$inc: {
+							failedCheckCount: 1,
+						},
+					});
 				});
-			})
-			.finally(async () => {
-				await host.updateOne({
-					$where: {
-						hostname: host.hostname,
-					},
-					$set: {
-						lastCheck: new Date(),
-					},
-					$inc: {
-						checkCount: 1,
-					},
-				});
-			});
+		});
 	}
 }
