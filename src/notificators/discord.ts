@@ -1,3 +1,4 @@
+import { notifyLogger } from "../lib/pino";
 import Notificator from "./notificator";
 import { ActivityType, Client, GatewayIntentBits } from "discord.js";
 
@@ -17,10 +18,10 @@ class Discord extends Notificator {
 		});
 
 		this._client.login(process.env.DISCORD_TOKEN).then(() => {
-			console.log("Discord client started");
+			notifyLogger.info("Discord client logged in.");
 
 			this._client.once("ready", () => {
-				console.log("Discord client ready");
+				notifyLogger.info("Discord client ready.");
 
 				this.updateActivity();
 			});
@@ -53,6 +54,23 @@ class Discord extends Notificator {
 			.users.fetch(target)
 			.then((user) => {
 				user.send(subject + "\n\n" + message);
+
+				notifyLogger.info({
+					msg: "Discord message sent",
+					subject,
+					message,
+					hostname,
+					target,
+				});
+			})
+			.catch(() => {
+				notifyLogger.info({
+					msg: "Discord message failed",
+					subject,
+					message,
+					hostname,
+					target,
+				});
 			});
 	}
 }

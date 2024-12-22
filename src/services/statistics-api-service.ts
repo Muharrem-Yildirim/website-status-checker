@@ -1,3 +1,4 @@
+import { httpLogger } from "../lib/pino";
 import Host from "../schemas/host";
 
 const getStatistics = async (
@@ -26,7 +27,10 @@ const getStatistics = async (
 				])
 			)[0]?.checkCount ?? 0;
 	} catch (err) {
-		console.log(err);
+		httpLogger.error({
+			msg: "Error getting total checks.",
+			details: err.stack,
+		});
 	}
 
 	try {
@@ -45,7 +49,10 @@ const getStatistics = async (
 				])
 			)[0]?.failedCheckCount ?? 0;
 	} catch (err) {
-		console.log(err);
+		httpLogger.error({
+			msg: "Error getting total failed checks.",
+			details: err.stack,
+		});
 	}
 
 	return res.json({

@@ -2,6 +2,7 @@ import cron from "node-cron";
 import Host, { Plan } from "./schemas/host";
 import { ping } from "./services/checker-service";
 import notificatorMap from "./notificators/notificator-map";
+import mainLogger, { notifyLogger } from "./lib/pino";
 
 function initNotificators() {
 	Object.keys(notificatorMap).forEach(async (target) => {
@@ -9,7 +10,13 @@ function initNotificators() {
 			.then((notificator) => {
 				if (notificator.default.init) notificator.default.init();
 			})
-			.catch(console.error);
+			.catch((err) => {
+				notifyLogger.error({
+					msg: "Failed to init notificator",
+					details: err.stack,
+					target,
+				});
+			});
 	});
 }
 
@@ -84,7 +91,7 @@ export function initCrons() {
 		job();
 	}
 
-	console.log("Crons initialized");
+	mainLogger.info("Crons initialized.");
 
 	initNotificators();
 }

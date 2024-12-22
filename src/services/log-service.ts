@@ -1,3 +1,4 @@
+import { notifyLogger } from "../lib/pino";
 import notificatorMap from "../notificators/notificator-map";
 import Log, { LogTypes } from "../schemas/log";
 
@@ -18,15 +19,15 @@ async function log(host, type, message) {
 	if (isStatusChanged) {
 		broadcast(host, type, message);
 	} else {
-		console.log("Skipped notification for ", host.hostname);
+		notifyLogger.info({ msg: "Skipped notification for ", host });
 	}
 
-	console.log(
-		`[${new Date().toUTCString()}] [${type}] ${
-			message ?? "Successfully connected."
-		}`,
-		host.hostname
-	);
+	notifyLogger.info({
+		msg: `[${type}] ${message ?? "Successfully connected."}`,
+		host,
+		date: new Date().toUTCString(),
+		type,
+	});
 
 	if (global.loggingEnabled) await log.save();
 }
@@ -57,14 +58,21 @@ function broadcast(host, type, message) {
 						host.notifyOptions[target]?.target
 					);
 
-					console.log(
-						"Notified target:",
+					notifyLogger.info({
+						msg: "Notified target",
 						target,
-						"Options",
-						host.notifyOptions[target]
-					);
+						options: host.notifyOptions[target],
+						host,
+					});
 				})
-				.catch(console.error);
+				.catch((err) => {
+					notifyLogger.error({
+						msg: "Failed to notify target",
+						details: err.stack,
+						target,
+						host,
+					});
+				});
 		}
 	});
 }

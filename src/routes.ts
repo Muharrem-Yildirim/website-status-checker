@@ -14,6 +14,7 @@ import {
 import { getStatistics } from "./services/statistics-api-service";
 import http from "http";
 import compression from "compression";
+import mainLogger, { httpLogger } from "./lib/pino";
 
 const app = express();
 const apiRouter = express.Router();
@@ -25,14 +26,24 @@ export async function initRoutes() {
 	server.headersTimeout = 10000;
 
 	server.listen(port, () => {
-		console.log(`Server listening on port ${port}`);
+		mainLogger.info(`Server listening on port ${port}`);
 	});
 
-	app.use(express.static("public"));
 	app.use(express.json());
 	app.use(compression());
 
 	app.use("/api", apiRouter);
+	app.use(function (req, res, next) {
+		httpLogger.info({
+			method: req.method,
+			url: req.url,
+			body: req.body,
+			params: req.params,
+			headers: req.headers,
+		});
+
+		next();
+	});
 
 	apiRouter.use(
 		expressBasicAuth({
@@ -66,12 +77,16 @@ export async function initRoutes() {
 	apiRouter.delete("/hosts/:id", deleteHost);
 
 	apiRouter.delete("/unregister-host/:hostname", (req: Request, res) => {
-		console.log("Received request:", req.params);
 		const { hostname, ownerIdentifier } = req.params;
 
 		Host.findOneAndDelete({ hostname, ownerIdentifier })
 			.then((host) => {
 				if (!host) {
+					httpLogger.error({
+						msg: "Error unregistering host: Hostname not found",
+						params: req.params,
+					});
+
 					return res.status(404).json({
 						success: false,
 						message: "Hostname not found.",
@@ -81,6 +96,12 @@ export async function initRoutes() {
 				res.status(StatusCodes.NO_CONTENT).json({});
 			})
 			.catch((err) => {
+				httpLogger.error({
+					msg: "Error unregistering host.",
+					details: err.stack,
+					params: req.params,
+				});
+
 				res.status(500).json({
 					success: false,
 					message: "Error unregistering host.",

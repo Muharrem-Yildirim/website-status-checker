@@ -2,6 +2,7 @@ import axios, { AxiosError, isAxiosError } from "axios";
 import { LogTypes } from "../schemas/log";
 import { log } from "./log-service";
 import axiosRetry, { isRetryableError, isNetworkError } from "axios-retry";
+import { checkerLogger } from "../lib/pino";
 
 const TIMEOUT = 10000;
 
@@ -10,13 +11,16 @@ axiosRetry(axios, {
 	shouldResetTimeout: true,
 	retryDelay: (retryCount) => retryCount * TIMEOUT,
 	onRetry: async (retryCount, error) => {
-		console.log(
-			`Retrying... ${retryCount} time(s). Message: `,
-			error.message,
-			isAxiosError(error)
-				? "Host is: " + (error as AxiosError).config.url
-				: "Not axios error"
-		);
+		const errorDetail = isAxiosError(error)
+			? "Host is: " + (error as AxiosError).config.url
+			: "Not axios error";
+
+		checkerLogger.info({
+			msg: "Retrying... ",
+			details: error.stack,
+			times: retryCount,
+			errorDetail,
+		});
 	},
 	retryCondition: (error) => {
 		return (
@@ -48,11 +52,22 @@ export function ping(hosts) {
 					},
 				})
 				.then(({ status }) => {
-					console.log("Success, Status: ", status, host.hostname);
+					checkerLogger.info({
+						msg: "Successfully connected",
+						status,
+						host,
+					});
+
 					log(host, LogTypes.SUCCESS, null);
 				})
 				.catch(async (error) => {
 					log(host, LogTypes.ERROR, error.message);
+
+					checkerLogger.error({
+						msg: "Error while connecting",
+						error,
+						host,
+					});
 
 					await host.updateOne({
 						$where: {

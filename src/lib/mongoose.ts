@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import mainLogger from "./pino";
 
 export const connect = async () => {
 	await mongoose.connect(process.env.MONGODB_URI, {
@@ -6,12 +7,12 @@ export const connect = async () => {
 		maxPoolSize: 10,
 	});
 
-	console.log("Connected to MongoDB.");
+	mainLogger.info("Connected to MongoDB.");
 };
 export const disconnect = async () => {
 	await mongoose.disconnect();
 
-	console.log("Disconnected from MongoDB.");
+	mainLogger.info("Disconnected from MongoDB.");
 };
 
 export default mongoose;

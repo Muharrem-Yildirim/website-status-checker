@@ -2,6 +2,7 @@ import { StatusCodes } from "http-status-codes";
 import Host, { Plan } from "../schemas/host";
 import mongoose from "../lib/mongoose";
 import Log from "../schemas/log";
+import { httpLogger } from "../lib/pino";
 
 const getHosts = (
 	req: Request & {
@@ -32,14 +33,19 @@ const getHosts = (
 				success: true,
 				data: hosts,
 			});
+
+			httpLogger.info({ msg: "Fetched hosts." });
 		})
 		.catch((err) => {
-			console.log(err);
-
 			res.status(500).json({
 				success: false,
 				message: "Error fetching hosts.",
 				details: err,
+			});
+
+			httpLogger.error({
+				msg: "Error fetching hosts.",
+				details: err.stack,
 			});
 		});
 };
@@ -77,15 +83,27 @@ const getHostById = (
 		.lean()
 
 		.then((host) => {
-			if (!host) throw new Error("Host not found");
+			if (!host) {
+				httpLogger.error({
+					msg: "Host not found.",
+				});
+				throw new Error("Host not found");
+			}
 
 			res.json({
 				success: true,
 				data: host,
 			});
+
+			httpLogger.info({
+				msg: "Host fetched successfully.",
+			});
 		})
 		.catch((err) => {
-			console.log(err);
+			httpLogger.error({
+				msg: "Error fetching host.",
+				details: err.stack,
+			});
 
 			res.status(500).json({
 				success: false,
@@ -99,10 +117,7 @@ const saveHost = async (
 	req: Request & { validatedBody: any; query: { ownerIdentifier?: string } },
 	res
 ) => {
-	console.log("Received request:", req.body);
 	const { hostname, ownerIdentifier, plan, protocol } = req.validatedBody;
-
-	console.log(req.validatedBody);
 
 	const isAlreadyExists = await Host.findOne({
 		ownerIdentifier,
@@ -111,6 +126,10 @@ const saveHost = async (
 	});
 
 	if (isAlreadyExists) {
+		httpLogger.info({
+			msg: "Host already exists.",
+		});
+
 		return res.status(403).json({
 			success: false,
 			message: "Host already exists.",
@@ -141,9 +160,17 @@ const saveHost = async (
 				message: `Successfully registered ${hostname}.`,
 				data,
 			});
+
+			httpLogger.info({
+				msg: "Host registered",
+			});
 		})
 		.catch((err) => {
-			console.log(err);
+			httpLogger.error({
+				msg: "Error registering host.",
+				details: err.stack,
+			});
+
 			res.status(500).json({
 				success: false,
 				message: "Error registering host.",
@@ -156,7 +183,6 @@ const updateHost = async (
 	req: Request & { validatedBody: any; params: { id: string } },
 	res
 ) => {
-	console.log("Received request:", req.body);
 	const { hostname, ownerIdentifier } = req.validatedBody;
 	const { id } = req.params;
 
@@ -174,15 +200,25 @@ const updateHost = async (
 				message: `Successfully registered ${hostname}.`,
 				data,
 			});
+
+			httpLogger.info({
+				msg: "Host updated",
+			});
 		})
 		.catch((err) => {
-			console.log(err);
+			const message =
+				err.code === 11000
+					? "Host already exists."
+					: "Error registering host.";
+
+			httpLogger.error({
+				msg: "Error updating host",
+				details: err.stack,
+			});
+
 			res.status(500).json({
 				success: false,
-				message:
-					err.code === 11000
-						? "Host already exists."
-						: "Error registering host.",
+				message,
 				details: err,
 			});
 		});
@@ -201,6 +237,10 @@ const deleteHost = (
 	Host.deleteOne({ ownerIdentifier, _id: id })
 		.then(async (host) => {
 			if (!host) {
+				httpLogger.error({
+					msg: "Hostname not found.",
+				});
+
 				return res.status(404).json({
 					success: false,
 					message: "Hostname not found.",
@@ -212,6 +252,11 @@ const deleteHost = (
 			res.status(StatusCodes.NO_CONTENT).json({});
 		})
 		.catch((err) => {
+			httpLogger.error({
+				msg: "Error unregistering host.",
+				details: err.stack,
+			});
+
 			res.status(500).json({
 				success: false,
 				message: "Error unregistering host.",
