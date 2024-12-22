@@ -2,6 +2,7 @@ import pino from "pino";
 import path from "path";
 import fs from "fs";
 import rotatingFileStream from "pino-rotating-file-stream";
+import { getId } from "exp-correlator";
 
 const getLogDir = () => {
 	const date = new Date();
@@ -48,6 +49,9 @@ const createLogger = (channel: string) => {
 			level: process.env.PINO_LOG_LEVEL || "info",
 			timestamp: pino.stdTimeFunctions.isoTime,
 			base: { channel },
+			mixin: () => {
+				return { "trace-id": getId() };
+			},
 		},
 		transport
 	);

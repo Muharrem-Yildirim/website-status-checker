@@ -15,6 +15,7 @@ import { getStatistics } from "./services/statistics-api-service";
 import http from "http";
 import compression from "compression";
 import mainLogger, { httpLogger } from "./lib/pino";
+import { middleware as expCorrelator, getId } from "exp-correlator";
 
 const app = express();
 const apiRouter = express.Router();
@@ -31,8 +32,7 @@ export async function initRoutes() {
 
 	app.use(express.json());
 	app.use(compression());
-
-	app.use("/api", apiRouter);
+	app.use(expCorrelator);
 	app.use(function (req, res, next) {
 		httpLogger.info({
 			method: req.method,
@@ -44,6 +44,8 @@ export async function initRoutes() {
 
 		next();
 	});
+
+	app.use("/api", apiRouter);
 
 	apiRouter.use(
 		expressBasicAuth({

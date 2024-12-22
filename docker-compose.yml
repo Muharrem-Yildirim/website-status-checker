@@ -9,6 +9,8 @@ services:
         depends_on:
             - mongo
         restart: always
+        volumes:
+            - ./logs:/app/logs
         networks:
             - app-network
 
