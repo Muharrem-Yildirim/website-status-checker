@@ -14,19 +14,8 @@ function initNotificators() {
 }
 
 async function job() {
-	const query = {
+	const baseQuery = {
 		$or: [
-			{
-				lastCheck: {
-					$lt: new Date(
-						Date.now() -
-							1000 *
-								(parseInt(process.env.CHECK_INTERVAL) ||
-									60 * 60) *
-								2
-					),
-				},
-			},
 			{
 				lastCheck: null,
 			},
@@ -34,13 +23,49 @@ async function job() {
 		isActive: true,
 	};
 
+	const freeQuery = {
+		...baseQuery,
+		$or: [
+			{
+				lastCheck: {
+					$lt: new Date(
+						Date.now() -
+							1000 *
+								(parseInt(process.env.FREE_CHECK_INTERVAL) ||
+									60 * 60)
+					),
+				},
+			},
+			...baseQuery.$or,
+		],
+		plan: Plan.FREE,
+	};
+
 	const FREE_PLAN_WEBSITES = await Host.find({
-		...query,
+		...freeQuery,
 		plan: Plan.FREE,
 	});
 
+	const paidQuery = {
+		...baseQuery,
+		$or: [
+			{
+				lastCheck: {
+					$lt: new Date(
+						Date.now() -
+							1000 *
+								(parseInt(process.env.PAID_CHECK_INTERVAL) ||
+									2 * 60)
+					),
+				},
+			},
+			...baseQuery.$or,
+		],
+		plan: Plan.FREE,
+	};
+
 	const PAID_PLAN_WEBSITES = await Host.find({
-		...query,
+		...paidQuery,
 		plan: Plan.PAID,
 	});
 
