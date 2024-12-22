@@ -72,8 +72,9 @@ async function job() {
 	ping(FREE_PLAN_WEBSITES);
 	ping(PAID_PLAN_WEBSITES);
 
-	global.totalHostCount =
-		FREE_PLAN_WEBSITES.length + PAID_PLAN_WEBSITES.length;
+	global.totalHostCount = await Host.countDocuments({
+		isActive: true,
+	});
 }
 
 export function initCrons() {
