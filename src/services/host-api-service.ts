@@ -100,13 +100,14 @@ const saveHost = async (
 	res
 ) => {
 	console.log("Received request:", req.body);
-	const { hostname, ownerIdentifier, plan } = req.validatedBody;
+	const { hostname, ownerIdentifier, plan, protocol } = req.validatedBody;
 
 	console.log(req.validatedBody);
 
 	const isAlreadyExists = await Host.findOne({
 		ownerIdentifier,
 		hostname,
+		protocol,
 	});
 
 	if (isAlreadyExists) {
