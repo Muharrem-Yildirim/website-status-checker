@@ -1,22 +1,30 @@
 name: "website-status-checker"
 services:
-  app:
-    build: .
-    ports:
-      - "3000:3000"
-    environment:
-      MONGO_URI: mongodb://mongo:27017/website-status-checker
-    depends_on:
-      - mongo
-    restart: always
+    app:
+        build: .
+        ports:
+            - "3000:3000"
+        environment:
+            MONGO_URI: mongodb://mongo:27017/website-status-checker
+        depends_on:
+            - mongo
+        restart: always
+        networks:
+            - app-network
 
-  mongo:
-    image: mongo
-    volumes:
-      - mongo-data:/data/db
-    restart: always
-    ports:
-      - "27000:27017"
+    mongo:
+        image: mongo
+        volumes:
+            - mongo-data:/data/db
+        restart: always
+        ports:
+            - "27000:27017"
+        networks:
+            - app-network
 
 volumes:
-  mongo-data:
+    mongo-data:
+
+networks:
+    app-network:
+        driver: bridge
