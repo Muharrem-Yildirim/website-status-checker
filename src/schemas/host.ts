@@ -13,6 +13,8 @@ export interface IHost {
 	notifyOptions: {
 		mail: boolean;
 		telegram: boolean;
+		webhook: boolean;
+		discord: boolean;
 	};
 	checkCount: number;
 	failedCheckCount: number;
