@@ -1,9 +1,6 @@
 import { initCrons } from "./cron";
 import * as mongoose from "./lib/mongoose";
 import { initRoutes } from "./routes";
-import Log, { LogTypes } from "./schemas/log";
-import Host from "./schemas/host";
-import { log } from "./services/log-service";
 import dotenv from "dotenv";
 global.loggingEnabled = false;
 
@@ -23,3 +20,5 @@ process.on("uncaughtException", (error) => {
 main();
 initRoutes();
 initCrons();
+
+global.totalHostCount = null;

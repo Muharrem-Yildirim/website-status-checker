@@ -22,11 +22,30 @@ class Discord extends Notificator {
 			this._client.once("ready", () => {
 				console.log("Discord client ready");
 
-				this._client.user.setActivity("Checking..", {
-					type: ActivityType.Watching,
-				});
+				this.updateActivity();
 			});
 		});
+
+		setInterval(() => {
+			this.updateActivity();
+		}, 1 * 60 * 1000);
+	}
+
+	updateActivity() {
+		const emojis = ["✨", "🎉", "🌟"];
+
+		this._client.user.setActivity(
+			global.totalHostCount !== null
+				? `Checking ${global.totalHostCount} hosts.. ${
+						emojis[Math.floor(Math.random() * (emojis.length - 1))]
+				  }`
+				: `Checking.. ${
+						emojis[Math.floor(Math.random() * (emojis.length - 1))]
+				  }`,
+			{
+				type: ActivityType.Watching,
+			}
+		);
 	}
 
 	notify(subject, message, hostname, target) {
