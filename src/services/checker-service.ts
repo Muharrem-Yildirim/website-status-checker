@@ -1,8 +1,9 @@
-import axios, { AxiosError, isAxiosError } from "axios";
+import { AxiosError, isAxiosError } from "axios";
 import { LogTypes } from "../schemas/log";
 import { log } from "./log-service";
 import axiosRetry, { isRetryableError, isNetworkError } from "axios-retry";
 import { checkerLogger } from "../lib/pino";
+import axios from "../lib/axios";
 
 const TIMEOUT = 10000;
 
