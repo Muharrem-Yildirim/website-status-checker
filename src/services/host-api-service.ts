@@ -186,11 +186,11 @@ const updateHost = async (
 	const { hostname, ownerIdentifier } = req.validatedBody;
 	const { id } = req.params;
 
-	Host.updateOne(
+	Host.findOneAndUpdate(
 		{ ownerIdentifier, _id: id },
 		{ ...req.validatedBody },
 		{
-			returnDocument: "after",
+			new: true,
 		}
 	)
 		.lean()
